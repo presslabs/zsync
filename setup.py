@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-requires = [ ]
+requires = [ "pyCLI>=2.0.3" ]
 
 setup(name="zsync",
       version="0.1",
@@ -12,7 +12,7 @@ setup(name="zsync",
       author_email = "contact@presslabs.com",
       url = "https://github.com/presslabs/zsync",
       description = "ZFS snapshot synchronization for ninjas",
-      entry_points = {'console_scripts': [ 'arcade = zsync.runner:execute_from_cli' ]},
+      entry_points = {'console_scripts': [ 'zsync= zsync.runner:execute_from_cli' ]},
       test_requirements = [],
       classifiers = [
         'Development Status :: 5 - Production/Stable',

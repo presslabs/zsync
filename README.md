@@ -30,4 +30,10 @@ PULL FROM S3
 ```
 zsync s3://bucket_name/prefix/dataset/bulk_id@snapshot tank/instances
 zsync s3://bucket_name/prefix/dataset/bulk_id tank/instances
+
+prefix/dataset/snapshotA
+prefix/dataset/snapshotA/snapshotB
+prefix/dataset/snapshotC
+prefix/dataset/snapshotC
+prefix/dataset/snapshotC
 ```
