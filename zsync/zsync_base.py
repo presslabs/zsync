@@ -1,5 +1,7 @@
 from urlparse import urlparse
 
+from zsync.factory import Factory
+
 class Path(object):
 
   def __init__(self, uri):
@@ -20,6 +22,8 @@ class Path(object):
 
     if self.scheme == "" and self.host == "" and self.path != "":
       self.local = True
+
+      self.kind = "Local"
     else:
       self.local = False
 
@@ -29,11 +33,13 @@ class Path(object):
 
     if self.scheme == "zfs":
       self.remote = True
+
+      self.kind = "Remote"
     else:
       self.remote = False
 
     if self.scheme == "s3":
-
+      self.kind = "S3"
       self.s3 = True
 
       if self.host == "":
