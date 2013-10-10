@@ -1,6 +1,8 @@
+from zsync import Local, Remote, S3
+
 from urlparse import urlparse
 
-from zsync import Schema
+SUPPORTED_SCHEMA = ["zfs", "s3", ""]
 
 class Path(object):
 
@@ -15,7 +17,7 @@ class Path(object):
 
     self.path = parsed_url.path
 
-    if self.scheme not in Schema.SUPPORTED:
+    if self.scheme not in SUPPORTED_SCHEMA:
       raise AttributeError("You need to suply a location that is either zfs or s3 or local")
 
     self.bucket = self.host
@@ -23,7 +25,7 @@ class Path(object):
     if self.scheme == "" and self.host == "" and self.path != "":
       self.local = True
 
-      self.kind = Schema.LOCAL
+      self.kind = Local
     else:
       self.local = False
 
@@ -34,12 +36,12 @@ class Path(object):
     if self.scheme == "zfs":
       self.remote = True
 
-      self.kind = Schema.REMOTE
+      self.kind = Remote
     else:
       self.remote = False
 
     if self.scheme == "s3":
-      self.kind = Schema.S3
+      self.kind = S3
       self.s3 = True
 
       if self.host == "":

@@ -1,5 +1,3 @@
-from .schema import Schema
-
 from .pipeable import Pipeable
 from .receivable import Receivable
 
