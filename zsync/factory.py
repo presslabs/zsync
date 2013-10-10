@@ -6,6 +6,7 @@ class Factory(object):
     self.path = path
 
   def get(self):
+
     klass_name = self.path.kind.capitalize()
 
     return getattr(zsync, klass_name)(self.path)

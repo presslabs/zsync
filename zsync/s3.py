@@ -1,4 +1,4 @@
-from zsync.pipeable import Pipeable
+from zsync import Pipeable, Receivable
 
 class S3(Pipeable):
 
@@ -7,3 +7,6 @@ class S3(Pipeable):
 
   def pipe(self, to):
     print "Pipe from %s to %s" % (self.path.kind, to.path.kind)
+
+  def receive(self):
+    pass
