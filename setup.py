@@ -13,7 +13,7 @@ setup(name="zsync",
       url = "https://github.com/presslabs/zsync",
       description = "ZFS snapshot synchronization for ninjas",
       entry_points = {'console_scripts': [ 'zsync= zsync.runner:execute_from_cli' ]},
-      test_requirements = [],
+      test_requirements = ['nose>=1.2.1','coverage>=3.5.2','mock>=1.0.1', "nosexcover>=1.0.8"],
       classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',

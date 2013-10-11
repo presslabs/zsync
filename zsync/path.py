@@ -1,5 +1,4 @@
 from zsync import Local, Remote, S3
-
 from urlparse import urlparse
 
 SUPPORTED_SCHEMA = ["zfs", "s3", ""]
@@ -11,6 +10,7 @@ class Path(object):
 
     self.scheme = parsed_url.scheme
     self.host = parsed_url.netloc
+    self.snapshot = ""
 
     if self.host.endswith(":"):
       self.host = self.host[:-1]
