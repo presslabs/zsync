@@ -16,5 +16,7 @@ zsync.add_param('--dryrun', action='store_const', default=False, const=True,
                 help="Doesn't do the actual synchronisation but only shows which \
                 snapshots are going to be transfered")
 
+zsync.add_param('-e', help='Remote shell user settings')
+
 def execute_from_cli():
   zsync.run()

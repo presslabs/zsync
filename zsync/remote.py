@@ -1,15 +1,13 @@
-from zsync import Pipeable, Receivable
+from zsync import Pipeable, Receivable, S3
 
 class Remote(Pipeable, Receivable):
 
-  def __init__(self, path):
-    self.path = path
+  def __init__(self, data):
+    self.data = data
 
   def pipe(self, to):
-    if to.path.kind == "S3" or to.path.kind == "Remote":
+    if isinstance(to, S3) or isinstance(to, Remote):
       raise NotImplementedError("Remote to Remote or Remote to S3 is not implemented")
-
-    print "Pipe from %s to %s" % (self.path.kind, to.path.kind)
 
   def receive(self):
     pass

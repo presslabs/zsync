@@ -1,4 +1,4 @@
-from path import Path
+from location import Location
 from zsync.factory import Factory
 
 class ZSyncBase(object):
@@ -7,10 +7,10 @@ class ZSyncBase(object):
     self.params = params
 
   def run(self):
-    source_path = Path(self.params.source)
-    destination_path = Path(self.params.destination)
+    source_location = Location.parse(self.params.source)
+    destination_location = Location.parse(self.params.destination)
 
-    source = Factory(source_path).get()
-    destination = Factory(destination_path).get()
+    source = Factory(source_location, self.params).get()
+    destination = Factory(destination_location, self.params).get()
 
-    source.pipe(destination)
+    source.send(destination)
