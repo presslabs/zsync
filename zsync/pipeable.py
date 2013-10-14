@@ -2,6 +2,8 @@ from abc import ABCMeta, abstractmethod
 
 class Pipeable(object):
 
+  __metaclass__ = ABCMeta
+
   @abstractmethod
-  def pipe(self, to):
+  def send(self, to):
     pass
