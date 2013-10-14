@@ -32,6 +32,7 @@ class Local(Pipeable, Receivable):
     Otherwise you need to find a snapshot name in the source dataset
     that matches the latest snapshot of the destination
     """
+
     local_snapshot_manager = Snapshot(local=True, context=self)
 
     snapshot = self.data.snapshot

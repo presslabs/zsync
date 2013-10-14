@@ -60,6 +60,9 @@ class Location(object):
       self.dataset = self._path
       self.snapshot = None
 
+    if self.dataset.startswith("/"):
+      self.dataset = self.dataset[1:]
+
 class S3Location(Location):
 
   def __init__(self, parsed_url):
