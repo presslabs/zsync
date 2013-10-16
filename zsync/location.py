@@ -70,11 +70,22 @@ class S3Location(Location):
     self.kind = S3
 
     self.set_host()
+    self.bucket = self.host
 
-    self.bucket = "magic"
+    self.path = self._path.split("/")
+    self.dataset = self.path[-1]
+    self.path = self.path[:-1]
+
+    if self.dataset.find("@") != -1:
+      data = self.dataset.split("@")
+
+      self.dataset = data[0]
+      self.snapshot = data[1]
+    else:
+      self.snapshot = None
 
     if self.host == "":
-        raise AttributeError("When providing S3 locations you need to supply a bucket")
+      raise AttributeError("When providing S3 locations you need to supply a bucket")
 
 class RemoteLocation(Location):
 
