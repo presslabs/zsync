@@ -5,5 +5,5 @@ class Receivable(object):
   __metaclass__ = ABCMeta
 
   @abstractmethod
-  def receive(self):
+  def receive(self, data, dataset, destination):
     pass
