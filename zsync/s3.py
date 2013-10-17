@@ -49,15 +49,12 @@ class S3(Pipeable):
     destination_strategy = Snapshot.from_context(destination)
 
     # get destination dataset
-    destination_dataset = destination.data.dataset if hasattr(destination.data, "dataset") else destination.data.bucket
+    destination_dataset = destination.data.dataset
 
     # get latest snapshot from the destination
     latest_snapshot = destination_strategy.get_latest_snapshot(destination_dataset)
     # get local snapshots between, destination latest snapshot and the given snapshot
     all_snapshots = local_snapshot_manager.get_snapshots_between(self.data.dataset, latest_snapshot, until_snapshot)
-
-    print self.data.dataset, latest_snapshot, until_snapshot
-    print all_snapshots
 
     current_snapshot = all_snapshots[0]
     all_snapshots = all_snapshots[1:]
@@ -71,6 +68,25 @@ class S3(Pipeable):
                                       current_snapshot, remaining)
       current_snapshot = remaining
 
+  def _send_full_volume(self, until_snapshot, destination):
+    local_snapshot_manager = Snapshot.from_context(self)
+    destination_strategy = Snapshot.from_context(destination)
+
+    destination_dataset = destination.data.dataset
+
+    # get latest snapshot from the destination
+    latest_snapshot = destination_strategy.get_latest_snapshot(destination_dataset)
+    # get local snapshots between, destination latest snapshot and the given snapshot
+    all_snapshots = local_snapshot_manager.get_snapshots_between(self.data.dataset, latest_snapshot, until_snapshot)
+
+    self._send_incremental_volume(until_snapshot, destination)
+
+    if len(all_snapshots) > 1:
+      all_snapshots = all_snapshots[:-1]
+
+      for snapshot in all_snapshots:
+        destination.destroy(snapshot)
+
   def send(self, destination):
     # HACK Circular dependency hack
     from zsync import Remote
@@ -78,7 +94,6 @@ class S3(Pipeable):
       raise NotImplementedError("Remote to Remote or Remote to S3 is not implemented")
 
     local_snapshot_manager = Snapshot.from_context(self)
-    # if no snapshot provided get the last one
     snapshot = self.data.snapshot
 
     if snapshot == None:
@@ -93,7 +108,5 @@ class S3(Pipeable):
   def receive(self, source, dataset, snapshot_name):
     key = "/".join(self.data.path)
     key = key[1:]
-
     key += "/" + self.data.dataset + "@" + snapshot_name
-
     Uploader(AWS_ACCESS_KEY, AWS_SECRET_KEY).upload(source.stdout, self.data.bucket, key)
