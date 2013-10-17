@@ -10,14 +10,20 @@ class ZSyncBase(object):
   based on the type of the path. Then we delegate the sending and receiving
   to this types of objects.
   """
-  def __init__(self, params):
+  def __init__(self, params, log):
     self.params = params
+    self.log = log
 
   def run(self):
+    self.log.debug("Zsync started")
+
     source_location = Location.parse(self.params.source)
     destination_location = Location.parse(self.params.destination)
 
-    source = Factory(source_location, self.params).get()
-    destination = Factory(destination_location, self.params).get()
+    self.log.info("Source is set to %s", source_location)
+    self.log.info("Destination is set to %s", destination_location)
+
+    source = Factory(source_location, self.params, self.log).get()
+    destination = Factory(destination_location, self.params, self.log).get()
 
     source.send(destination)

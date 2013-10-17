@@ -1,10 +1,18 @@
-import cli.app
+"""
+Entry point for the zsync command line tool. Sets up the CLI params and then
+runs an instance of the ZSyncBase class.
+"""
+
+import cli.log
 
 from zsync.zsync_base import ZSyncBase
 
-@cli.app.CommandLineApp
+@cli.log.LoggingApp
 def zsync(app):
-  ZSyncBase(app.params).run()
+  """
+  Sets up ZsyncBase with params and logging and the runs it
+  """
+  ZSyncBase(app.params, app.log).run()
 
 zsync.add_param("source", help="The source volume that you want to synchronize from. Can be either local volume, remote (via ssh), or S3", default=False)
 zsync.add_param("destination", help="The destination volume that you want to synchronize the data to. Can either be local, remote (via ssh) or S3", default=False)
@@ -19,4 +27,7 @@ zsync.add_param('--dryrun', action='store_const', default=False, const=True,
 zsync.add_param('-e', help='Remote shell user settings')
 
 def execute_from_cli():
+  """
+  Entry point for zsync
+  """
   zsync.run()

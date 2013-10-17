@@ -87,6 +87,9 @@ class S3Location(Location):
     if self.host == "":
       raise AttributeError("When providing S3 locations you need to supply a bucket")
 
+  def __repr__(self):
+    return "<%s bucket=\"%s\" dataset=\"%s\" snapshot=\"%s\" prefix=\"%s\">" % (self.__class__.__name__, self.bucket, self.dataset, self.snapshot, "/".join(self.path))
+
 class RemoteLocation(Location):
 
   def __init__(self, parsed_url):
@@ -96,6 +99,9 @@ class RemoteLocation(Location):
     self.set_host()
     self.set_dataset_and_snapshot()
 
+  def __repr__(self):
+    return "<%s host=\"%s\" dataset=\"%s\" snapshot=\"%s\">" % (self.__class__.__name__, self.host, self.dataset, self.snapshot)
+
 class LocalLocation(Location):
 
   def __init__(self, parsed_url):
@@ -103,3 +109,6 @@ class LocalLocation(Location):
     self.kind = Local
 
     self.set_dataset_and_snapshot()
+
+  def __repr__(self):
+    return "<%s dataset=\"%s\" snapshot=\"%s\">" % (self.__class__.__name__, self.dataset, self.snapshot)

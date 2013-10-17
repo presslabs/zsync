@@ -11,7 +11,6 @@ class S3Snapshot(object):
     self.context = context
 
   def get_snapshots(self, volume):
-    print volume
     bucket = self.context.data.bucket
     path = "/".join(self.context.data.path)
     path = path[1:]

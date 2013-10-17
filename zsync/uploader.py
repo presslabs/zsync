@@ -15,6 +15,9 @@ from boto.s3.bucket import Bucket
 from futures import ThreadPoolExecutor
 
 class Uploader(object):
+  """
+  Uploads a stream to S3 with multipart upload
+  """
 
   def __init__(self, access_key, secret_key):
     self.access_key = access_key
@@ -34,14 +37,11 @@ class Uploader(object):
 
     while retries < 4:
       try:
-        print "Started chunk %s" % index
         do_upload(bucket, chunk, index)
-        print "Uploaded chunk %s" % index
         break
       except Exception as e:
         traceback.print_exc()
 
-        print "Retrying part %s" % index
         retries += 1
         time.sleep(2**retries)
 
@@ -72,4 +72,3 @@ class Uploader(object):
 
     [ future.result() for future in greenlets ]
     completed = multipart.complete_upload()
-
