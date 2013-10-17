@@ -1,4 +1,4 @@
-from subprocess import PIPE, Popen
+from subprocess import PIPE, Popen, call
 
 from snapshot import Snapshot
 from zsync import Pipeable, Receivable
@@ -7,6 +7,10 @@ class Local(Pipeable, Receivable):
 
   def __init__(self, data):
     self.data = data
+
+  def destroy(self, snapshot):
+    cmd = "zfs destroy %s@%s" % (self.data.dataset, snapshot)
+    data = call(cmd, shell=True, stdout=PIPE)
 
   def _send_full_snahpshot(self, dataset, destination, first_snapshot):
 
