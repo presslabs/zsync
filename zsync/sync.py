@@ -25,8 +25,7 @@ class Sync(Pipeable, Receivable):
     """
     Send either full or incremental snapshot
     """
-
-    local_snapshot_manager = Snapshot(local=True, context=self)
+    local_snapshot_manager = Snapshot.from_context(self)
 
     # if no snapshot provided get the last one
     snapshot = self.data.snapshot

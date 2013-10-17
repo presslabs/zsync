@@ -23,8 +23,6 @@ class Local(Sync):
   def _send_incremental_snapshot(self, dataset, destination, first_snapshot,
                                  second_snapshot):
 
-    self.log.info("Running send incremental as cmd=\"%s\"" % cmd)
-
     cmd = "zfs send -I %s@%s %s@%s" % (dataset, first_snapshot, dataset, second_snapshot)
 
     self.log.info("Running send incremental as cmd=\"%s\"" % cmd)
@@ -33,7 +31,7 @@ class Local(Sync):
 
   def receive(self, source, dataset, snapshot_name):
 
-    self.log.info("Receiving local to dataset=\"%s\" and snapshot=\"%s\"", dataset, snapshot_name)
+    self.log.info("Receiving local to dataset=\"%s\" and snapshot=\"%s\"", self.data.dataset, snapshot_name)
 
     receive_endpoint = Popen(["zfs", "receive", "-F", self.data.dataset], stdin=source.stdout, stdout=PIPE)
     source.stdout.close()
