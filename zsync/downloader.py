@@ -1,14 +1,8 @@
-AWS_ACCESS_KEY = "AKIAJ6NBXHHV3P6IIXRA"
-AWS_SECRET_KEY = "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"
-
-CHUNK_SIZE = 50 * 1024 * 1024
 ONE_MBYTE = 1 * 1024 * 1024 # 1 Megabyte
-NUM_PARTS = 10
 
 import sys
 import time
-import traceback
-from cStringIO import StringIO
+import random
 
 import boto
 from boto.s3.key import Key
@@ -18,17 +12,55 @@ from futures import ThreadPoolExecutor
 
 class Downloader(object):
 
-  def __init__(self, access_key, secret_key):
+  def __init__(self, access_key, secret_key, chunk_size, concurrency):
     self.access_key = access_key
     self.secret_key = secret_key
+
+    self.chunk_size = chunk_size
+    self.concurrency = concurrency
+
     self.connection = boto.connect_s3(access_key, secret_key)
+
+  def download_part(self, fp, bucket, key, part):
+    min_byte = int(part * self.chunk_size)
+    max_byte = int((part+1) * self.chunk_size)
+
+    resp = self.connection.make_request(
+      "GET",
+      bucket=bucket, key=key,
+      headers={
+        'Range':"bytes=%d-%d" % (min_byte, max_byte)
+      }
+    )
+
+    data = resp.read(int(self.chunk_size))
+
+    return data
 
   def download(self, fp, bucket, key):
     bucket = self.connection.get_bucket(bucket, validate=False)
-    # prefix-lu-calin/magic@550PM
     key = bucket.get_key(key)
 
     resp = self.connection.make_request("HEAD", bucket=bucket, key=key)
     size = int(resp.getheader("content-length"))
 
-    key.get_contents_to_file(fp)
+    results = {}
+
+    if size < (self.concurrency-1) * self.chunk_size:
+      key.get_contents_to_file(fp)
+    else:
+      chunk_nb = size / self.chunk_size+ 1
+
+      with ThreadPoolExecutor(max_workers=self.concurrency) as executor:
+
+        for i in range(self.concurrency):
+          results[i] = executor.submit(self.download_part, fp, bucket, key, i)
+
+        for part in range(self.concurrency, int(chunk_nb) + self.concurrency):
+          data = results[int(part - self.concurrency)].result()
+          fp.write(data)
+
+          del results[int(part - self.concurrency)]
+
+          if part < chunk_nb:
+            results[part] = executor.submit(self.download_part, fp, bucket, key, part)
