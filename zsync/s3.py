@@ -1,4 +1,6 @@
 import os
+import sys
+
 from cStringIO import StringIO
 from collections import namedtuple
 
@@ -9,9 +11,6 @@ from zsync.downloader import Downloader
 from zsync.snapshot import Snapshot
 
 from multiprocessing import Process, Pipe
-
-AWS_ACCESS_KEY = "AKIAJ6NBXHHV3P6IIXRA"
-AWS_SECRET_KEY = "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"
 
 class S3(Sync):
   """
@@ -26,7 +25,13 @@ class S3(Sync):
     Downloads to a stream
     """
     fp = os.fdopen(fp, 'w')
-    Downloader(AWS_ACCESS_KEY, AWS_SECRET_KEY).download(fp, bucket, key)
+    AWS_ACCESS_KEY = os.environ["AWS_ACCESS_KEY_ID"]
+    AWS_SECRET_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
+
+    CHUNK_SIZE = self.args.size
+    CONCURRENCY = self.args.c
+
+    Downloader(AWS_ACCESS_KEY, AWS_SECRET_KEY, CHUNK_SIZE, CONCURRENCY).download(fp, bucket, key)
 
   def _send_full_snahpshot(self, dataset, destination, first_snapshot):
     """
@@ -38,17 +43,20 @@ class S3(Sync):
 
     self.log.info("Running send from bucket=%s, key=%s", self.data.bucket, key)
 
-    pipeout, pipein = os.pipe()
-    downloader_process = Process(target=self.downloader, args=(self.data.bucket, key, pipein))
+    if self.args.dryrun:
+      sys.stdout.write("s3cmd get s3://%s/%s - " % (self.data.bucket, key))
+    else:
+      pipeout, pipein = os.pipe()
+      downloader_process = Process(target=self.downloader, args=(self.data.bucket, key, pipein))
 
-    pipeout = os.fdopen(pipeout)
-    downloader_process.start()
+      pipeout = os.fdopen(pipeout)
+      downloader_process.start()
 
-    FakePopen = namedtuple('FakePopen', ['stdout'])
-    data = FakePopen(stdout=pipeout)
-    destination.receive(data, dataset, first_snapshot)
+      FakePopen = namedtuple('FakePopen', ['stdout'])
+      data = FakePopen(stdout=pipeout)
+      destination.receive(data, dataset, first_snapshot)
 
-    downloader_process.join()
+      downloader_process.join()
 
   def _send_incremental_snapshot(self, dataset, destination, first_snapshot,
                                  second_snapshot):
@@ -92,6 +100,15 @@ class S3(Sync):
     key = key[1:]
     key += "/" + self.data.dataset + "@" + snapshot_name
 
-    self.log.info("Receiving to s3 to bucket=%s, key=%s", self.data.bucket, key)
+    if self.args.dryrun:
+      sys.stdout.write(" | s3cmd put - s3://%s/%s\n" % (self.data.bucket, key))
+    else:
+      self.log.info("Receiving to s3 to bucket=%s, key=%s", self.data.bucket, key)
 
-    Uploader(AWS_ACCESS_KEY, AWS_SECRET_KEY).upload(source.stdout, self.data.bucket, key)
+      AWS_ACCESS_KEY = os.environ["AWS_ACCESS_KEY_ID"]
+      AWS_SECRET_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
+
+      CHUNK_SIZE = self.args.size
+      CONCURRENCY = self.args.c
+
+      Uploader(AWS_ACCESS_KEY, AWS_SECRET_KEY, CHUNK_SIZE, CONCURRENCY).upload(source.stdout, self.data.bucket, key)

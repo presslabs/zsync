@@ -26,6 +26,12 @@ zsync.add_param('--dryrun', action='store_const', default=False, const=True,
 
 zsync.add_param('-e', help='Remote shell user settings')
 
+zsync.add_param("--size", help="Chunk size when uploading. In MB", default=50)
+zsync.add_param("-c", help="Concurrency of upload/download - a number between 1 and 100", default=100)
+
+zsync.add_param("--exclude", help="Exclude snapshots matching this regex", default=None)
+zsync.add_param("--include", help="Include snapshots matching this regex", default=None)
+
 def execute_from_cli():
   """
   Entry point for zsync
