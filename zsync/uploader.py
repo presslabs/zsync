@@ -1,8 +1,3 @@
-AWS_ACCESS_KEY = "AKIAJW3VYJYPG3MZ3PWQ"
-AWS_SECRET_KEY = "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"
-
-CHUNK_SIZE = 100 * 1024 * 1024
-
 import sys
 import time
 import traceback
@@ -23,9 +18,12 @@ class Uploader(object):
   Uploads a stream to S3 with multipart upload
   """
 
-  def __init__(self, access_key, secret_key):
+  def __init__(self, access_key, secret_key, chunk_size, concurrency):
     self.access_key = access_key
     self.secret_key = secret_key
+
+    self.chunk_size = chunk_size
+    self.concurrency = concurrency
 
     self.connection = boto.connect_s3(access_key, secret_key)
 
@@ -34,12 +32,10 @@ class Uploader(object):
     retries = 0
 
     def do_upload(bucket, chunk, index):
-      print "Started chunk %s" % index
       part = boto.s3.multipart.MultiPartUpload(bucket)
       part.id = multipart.id
       part.key_name = multipart.key_name
       part.upload_part_from_file(StringIO(chunk), index+1, replace=True)
-      print "Finished chunk %s" % index
 
     while retries < 5:
       try:
@@ -62,15 +58,15 @@ class Uploader(object):
 
     greenlets = []
 
-    sem = Semaphore(100)
+    sem = Semaphore(self.concurrency)
     def release(future):
       sem.release()
 
     try:
-      with ThreadPoolExecutor(max_workers=40) as executor:
+      with ThreadPoolExecutor(max_workers=self.concurrency) as executor:
         while True:
           sem.acquire()
-          buff = stream.read(CHUNK_SIZE)
+          buff = stream.read(self.chunk_size)
 
           if len(buff) == 0:
             break
