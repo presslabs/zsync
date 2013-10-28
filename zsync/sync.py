@@ -1,3 +1,5 @@
+import fnmatch
+
 from zsync import Pipeable, Receivable
 
 from zsync.snapshot import Snapshot
@@ -20,6 +22,12 @@ class Sync(Pipeable, Receivable):
     self.log.info("Sending FULL Volume from %s dataset=%s and snapshot=%s", self.__class__.__name__, self.data.dataset, until_snapshot)
 
     self._send_full_snahpshot(self.data.dataset, destination, until_snapshot)
+
+  def validate(self, snapshot):
+    if self.args.exclude != None:
+      return not fnmatch.fnmatch(snapshot, self.args.exclude):
+    elif self.args.include != None:
+      return fnmatch.fnmatch(snapshot, self.args.include):
 
   def send(self, destination):
     """

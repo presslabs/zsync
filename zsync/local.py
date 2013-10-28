@@ -21,6 +21,10 @@ class Local(Sync):
   def _send_full_snahpshot(self, dataset, destination, first_snapshot):
     cmd = "zfs send %s@%s" % (dataset, first_snapshot)
 
+    if self.validate(first_snapshot) == False:
+      self.log.info("Ignoring snapshot %s@%s" % (dataset, first_snapshot))
+      return 
+
     if self.args.dryrun:
       sys.stdout.write(cmd)
       destination.receive(None, dataset, first_snapshot)
@@ -34,6 +38,10 @@ class Local(Sync):
                                  second_snapshot):
 
     cmd = "zfs send -I %s@%s %s@%s" % (dataset, first_snapshot, dataset, second_snapshot)
+
+    if self.validate(second_snapshot) == False:
+      self.log.info("Ignoring snapshot %s@%s" % (dataset, second_snapshot))
+      return
 
     if self.args.dryrun:
       sys.stdout.write(cmd)

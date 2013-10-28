@@ -17,6 +17,9 @@ class ZSyncBase(object):
   def run(self):
     self.log.debug("Zsync started")
 
+    if self.params.exclude != None and self.params.include != None:
+      raise AttributeError("You can use either exclude or include")
+
     source_location = Location.parse(self.params.source)
     destination_location = Location.parse(self.params.destination)
 
