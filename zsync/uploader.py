@@ -10,6 +10,12 @@ from boto.s3.bucket import Bucket
 from futures import ThreadPoolExecutor
 from threading import Semaphore
 
+try:
+  from raven import Client
+  client = Client('http://6374ae28bffb49ffb354c4ae7e90586b:6edd2b5c47b04afcb8853fe9b0d99976@sentry.presslabs.net/5')
+except:
+  pass
+
 class ChunkNotCompleted(Exception):
   pass
 
@@ -41,8 +47,11 @@ class Uploader(object):
       try:
         do_upload(bucket, chunk, index)
         break
-      except Exception as e:
-        traceback.print_exc()
+      except:
+
+        if client:
+          client.captureException()
+
         retries += 1
         time.sleep(2**retries)
 
