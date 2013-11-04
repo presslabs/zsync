@@ -38,10 +38,6 @@ class S3(Sync):
     Retrives a snapshot and passes it a pipe from which the zfs receive reads
     """
 
-    if self.validate(first_snapshot) == False:
-      self.log.info("Ignoring snapshot %s@%s" % (dataset, first_snapshot))
-      return 
-
     key = "/".join(self.data.path)
     key = key[1:]
     key += "/" + self.data.dataset + "@" + first_snapshot

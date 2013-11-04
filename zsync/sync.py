@@ -21,13 +21,24 @@ class Sync(Pipeable, Receivable):
 
     self.log.info("Sending FULL Volume from %s dataset=%s and snapshot=%s", self.__class__.__name__, self.data.dataset, until_snapshot)
 
+    # validate the until snapshot
+    if self.validate(until_snapshot) == False:
+      self.log.info("Ignoring snapshot %s@%s" % (self.data.dataset, until_snapshot))
+      return
+
+    """
+    send to each implementation the task to send the ZFS volume with the last
+    snapshot beeing _until_snapshot_
+    """
     self._send_full_snahpshot(self.data.dataset, destination, until_snapshot)
 
   def validate(self, snapshot):
     if self.args.exclude != None:
-      return not fnmatch.fnmatch(snapshot, self.args.exclude):
+      return not fnmatch.fnmatch(snapshot, self.args.exclude)
     elif self.args.include != None:
-      return fnmatch.fnmatch(snapshot, self.args.include):
+      return fnmatch.fnmatch(snapshot, self.args.include)
+
+    return True
 
   def send(self, destination):
     """
@@ -40,10 +51,20 @@ class Sync(Pipeable, Receivable):
     if snapshot == None:
       snapshot = local_snapshot_manager.get_latest_snapshot(self.data.dataset)
 
+    # if the full flag is provided than send full snapshot
     if self.args.full:
       self._send_full_volume(snapshot, destination)
     else:
       self._send_incremental_volume(snapshot, destination)
+
+  def filter_to_valid(self, all_snapshots):
+    results = []
+
+    for snapshot in all_snapshots:
+      if self.validate(snapshot):
+        results.append(snapshot)
+
+    return results
 
   def _send_incremental_volume(self, until_snapshot, destination):
     """
@@ -60,6 +81,8 @@ class Sync(Pipeable, Receivable):
     latest_snapshot = destination_strategy.get_latest_snapshot(destination_dataset)
     # get local snapshots between, destination latest snapshot and the given snapshot
     all_snapshots = local_snapshot_manager.get_snapshots_between(self.data.dataset, latest_snapshot, until_snapshot)
+
+    all_snapshots = self.filter_to_valid(all_snapshots)
 
     self.log.info("Sending incremental volume from %s dataset=%s and snapshot=%s", self.__class__.__name__, self.data.dataset, all_snapshots)
 

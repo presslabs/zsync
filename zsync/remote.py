@@ -12,10 +12,6 @@ class Remote(Sync):
   def _send_full_snahpshot(self, dataset, destination, first_snapshot):
     ssh_cmd = "%s %s zfs send %s@%s" % (self.args.e, self.data.host, dataset, first_snapshot)
 
-    if self.validate(first_snapshot) == False:
-      self.log.info("Ignoring snapshot %s@%s" % (dataset, first_snapshot))
-      return 
-
     if self.args.dryrun:
       sys.stdout.write(ssh_cmd)
     else:
@@ -29,10 +25,6 @@ class Remote(Sync):
     ssh_cmd = "%s %s zfs send -I %s@%s %s@%s" % (self.args.e, self.data.host, \
                                                 dataset, first_snapshot, \
                                                 dataset, second_snapshot )
-
-    if self.validate(second_snapshot) == False:
-      self.log.info("Ignoring snapshot %s@%s" % (dataset, second_snapshot))
-      return
 
     if self.args.dryrun:
       sys.stdout.write(ssh_cmd)
