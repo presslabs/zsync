@@ -22,8 +22,8 @@ class Uploader(object):
     self.access_key = access_key
     self.secret_key = secret_key
 
-    self.chunk_size = chunk_size
-    self.concurrency = concurrency
+    self.chunk_size = int(chunk_size) * 1024 * 1024
+    self.concurrency = int(concurrency)
 
     self.connection = boto.connect_s3(access_key, secret_key)
 
