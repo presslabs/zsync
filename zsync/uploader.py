@@ -31,10 +31,9 @@ class Uploader(object):
     self.chunk_size = int(chunk_size) * 1024 * 1024
     self.concurrency = int(concurrency)
 
-    self.connection = boto.connect_s3(access_key, secret_key)
-
   def upload_part(self, multipart, chunk, index):
-    bucket = self.connection.get_bucket(multipart.bucket_name, validate=False)
+    connection = boto.connect_s3(self.access_key, self.secret_key)
+    bucket = connection.get_bucket(multipart.bucket_name, validate=False)
     retries = 0
 
     def do_upload(bucket, chunk, index):
@@ -59,7 +58,8 @@ class Uploader(object):
       raise ChunkNotCompleted("Chunk %s not completed" % index)
 
   def upload(self, stream, bucket, key):
-    bucket = self.connection.get_bucket(bucket, validate=False)
+    connection = boto.connect_s3(self.access_key, self.secret_key)
+    bucket = connection.get_bucket(bucket, validate=False)
 
     multipart = bucket.initiate_multipart_upload(key, headers={ "x-amz-acl" : "bucket-owner-full-control" })
 
