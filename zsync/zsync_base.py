@@ -16,6 +16,9 @@ class ZSyncBase(object):
   Then we create objects from the three main classes: Local, Remote, S3
   based on the type of the path. Then we delegate the sending and receiving
   to this types of objects.
+
+  zsync tank/instances s3://<bucket>//whatever
+  zsync tank/instances ssh://user@masina:tank/other-instances
   """
   def __init__(self, params, log):
     self.params = params
