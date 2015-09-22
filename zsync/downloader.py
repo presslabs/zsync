@@ -8,7 +8,7 @@ import boto
 from boto.s3.key import Key
 from boto.s3.bucket import Bucket
 
-from futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 
 try:
   from raven import Client
