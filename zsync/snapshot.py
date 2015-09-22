@@ -1,9 +1,8 @@
 import boto
+import os
 
 from subprocess import PIPE, STDOUT, Popen
 
-AWS_ACCESS_KEY = "AKIAJW3VYJYPG3MZ3PWQ"
-AWS_SECRET_KEY = "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"
 
 class S3Snapshot(object):
 
@@ -15,6 +14,8 @@ class S3Snapshot(object):
     path = "/".join(self.context.data.path)
     path = path[1:]
 
+    AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY_ID']
+    AWS_SECRET_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
     connection = boto.connect_s3(AWS_ACCESS_KEY, AWS_SECRET_KEY)
     bucket = connection.get_bucket(bucket, validate=False)
 
