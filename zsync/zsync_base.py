@@ -3,7 +3,8 @@ from zsync.factory import Factory
 
 try:
   from raven import Client
-  client = Client('http://6374ae28bffb49ffb354c4ae7e90586b:6edd2b5c47b04afcb8853fe9b0d99976@sentry.presslabs.net/5')
+  # client = Client('http://6374ae28bffb49ffb354c4ae7e90586b:6edd2b5c47b04afcb8853fe9b0d99976@sentry.presslabs.net/5')
+  client = None
 
 except:
   pass
