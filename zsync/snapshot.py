@@ -37,7 +37,7 @@ class S3Snapshot(object):
 
     for snap in snapshots:
       name = snap["name"]
-      result.append(name.split("@")[1])
+      result.append(name.split("@")[-1])
 
     return result
 
