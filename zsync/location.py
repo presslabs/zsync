@@ -73,7 +73,7 @@ class S3Location(Location):
     self.bucket = self.host
 
     self.path = self._path.split("/")
-    if len(path) > 1 and not self.path[-1]:
+    if len(self.path) > 1 and not self.path[-1]:
         self.dataset = self.path[-2]
     else:
         self.dataset = self.path[-1] 
