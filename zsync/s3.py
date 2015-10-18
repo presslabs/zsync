@@ -112,4 +112,9 @@ class S3(Sync):
       CHUNK_SIZE = self.args.size
       CONCURRENCY = self.args.c
 
-      Uploader(AWS_ACCESS_KEY, AWS_SECRET_KEY, CHUNK_SIZE, CONCURRENCY).upload(source.stdout, self.data.bucket, key)
+      Uploader(
+        AWS_ACCESS_KEY,
+        AWS_SECRET_KEY,
+        CHUNK_SIZE,
+        CONCURRENCY,
+      ).upload(source.stdout, self.data.bucket, key, self.args.storage_class)

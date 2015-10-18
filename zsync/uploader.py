@@ -25,7 +25,7 @@ class Uploader(object):
   Uploads a stream to S3 with multipart upload
   """
 
-  def __init__(self, access_key, secret_key, chunk_size, concurrency):
+  def __init__(self, access_key, secret_key, chunk_size, concurrency, storage_class):
     self.access_key = access_key
     self.secret_key = secret_key
 
@@ -58,11 +58,17 @@ class Uploader(object):
     if retries == 5:
       raise ChunkNotCompleted("Chunk %s not completed" % index)
 
-  def upload(self, stream, bucket, key):
+  def upload(self, stream, bucket, key, storage_class):
     connection = boto.connect_s3(self.access_key, self.secret_key)
     bucket = connection.get_bucket(bucket, validate=False)
 
-    multipart = bucket.initiate_multipart_upload(key, headers={ "x-amz-acl" : "bucket-owner-full-control" })
+    multipart = bucket.initiate_multipart_upload(
+      key,
+      headers={
+        "x-amz-acl": "bucket-owner-full-control",
+        "x-amz-storage-class": storage_class
+      }
+    )
 
     index = 0
 
