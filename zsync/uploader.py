@@ -25,7 +25,7 @@ class Uploader(object):
   Uploads a stream to S3 with multipart upload
   """
 
-  def __init__(self, access_key, secret_key, chunk_size, concurrency, storage_class):
+  def __init__(self, access_key, secret_key, chunk_size, concurrency):
     self.access_key = access_key
     self.secret_key = secret_key
 
