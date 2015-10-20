@@ -30,6 +30,8 @@ zsync.add_param("--size", help="Chunk size when uploading. In MB", default=50)
 zsync.add_param("-c", help="Concurrency of upload/download - a number between 1 and 100", default=100)
 zsync.add_param("--storage-class", dest='storage_class', default='STANDARD',
                 help="Specify the S3 storage class (STANDARD, STANDARD_IA, or REDUCED_REDUNDANCY).")
+zsync.add_param("--snap-filter", dest='snap_filter', default='',
+                help="Used to filter the zfs snapshots.")
 
 
 zsync.add_param("--exclude", help="Exclude snapshots matching this regex", default=None)

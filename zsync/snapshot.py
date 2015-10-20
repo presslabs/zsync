@@ -77,7 +77,11 @@ class LocalSnapshot(object):
     self.context = context
 
   def get_snapshots(self, volume):
-    command = Popen("zfs list -t snap", shell=True, stdout=PIPE, stderr=STDOUT)
+    cmd = "zfs list -t snap"
+    if self.context.args.snap_filter:
+      cmd += " | grep {kw}".format(kw=self.context.args.snap_filter)
+
+    command = Popen(cmd, shell=True, stdout=PIPE, stderr=STDOUT)
 
     output = []
     for line in command.stdout.readlines():
