@@ -25,8 +25,8 @@ class S3(Sync):
     Downloads to a stream
     """
     fp = os.fdopen(fp, 'w')
-    AWS_ACCESS_KEY = os.environ["AWS_ACCESS_KEY_ID"]
-    AWS_SECRET_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
+    AWS_ACCESS_KEY = os.environ["ZSYNC_AWS_KEY"]
+    AWS_SECRET_KEY = os.environ["ZSYNC_AWS_SECRET"]
 
     CHUNK_SIZE = self.args.size
     CONCURRENCY = self.args.c
@@ -106,8 +106,8 @@ class S3(Sync):
     else:
       self.log.info("Receiving to s3 to bucket=%s, key=%s", self.data.bucket, key)
 
-      AWS_ACCESS_KEY = os.environ["AWS_ACCESS_KEY_ID"]
-      AWS_SECRET_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
+      AWS_ACCESS_KEY = os.environ["ZSYNC_AWS_KEY"]
+      AWS_SECRET_KEY = os.environ["ZSYNC_AWS_SECRET"]
 
       CHUNK_SIZE = self.args.size
       CONCURRENCY = self.args.c
