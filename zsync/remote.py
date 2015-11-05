@@ -35,7 +35,8 @@ class Remote(Sync):
       destination.receive(data, dataset, second_snapshot)
 
   def receive(self, source, dataset, snapshot_name):
-    ssh_cmd = self.args.e + " " + self.data.host + " zfs receive -F %s" % self.data.dataset
+    e = self.args.e or "ssh"
+    ssh_cmd = e + " " + self.data.host + " zfs receive -F %s" % self.data.dataset
 
     if self.args.dryrun:
       sys.stdout.write(" | " + ssh_cmd + "\n")
