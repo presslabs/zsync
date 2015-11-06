@@ -7,7 +7,7 @@ ZFS snapshot synchronization for ninjas
 
 PUSH
 ```
-zsync tank/instances@snapshot-name zfs://backup-z1.presslabs.com:tank/instances-z1
+zsync tank/instances@snapshot-name zfs://backup-z1.presslabs.com/tank/instances-z1
 
 Without the @ sign == latest snapshot
 ```
