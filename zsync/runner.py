@@ -34,7 +34,7 @@ zsync.add_param("--snap-filter", dest='snap_filter', default='',
                 help="Used to filter the zfs snapshots.")
 zsync.add_param("--access-key", dest='access_key', default='', help="S3 access key.")
 zsync.add_param("--secret-key", dest="secret_key", default='', help="S3 secret key.")
-
+zsync.add_param("--selective", action='store_const', default=False, const=True)
 
 zsync.add_param("--exclude", help="Exclude snapshots matching this regex", default=None)
 zsync.add_param("--include", help="Include snapshots matching this regex", default=None)

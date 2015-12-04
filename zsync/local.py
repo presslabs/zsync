@@ -33,7 +33,12 @@ class Local(Sync):
   def _send_incremental_snapshot(self, dataset, destination, first_snapshot,
                                  second_snapshot):
 
-    cmd = "zfs send -I %s@%s %s@%s" % (dataset, first_snapshot, dataset, second_snapshot)
+    cmd = "zfs send {send_type} {dataset}@{first_snapshot} {dataset}@{second_snapshot}".format(
+      send_type="-i" if self.args.selective else "-I",
+      dataset=dataset,
+      first_snapshot=first_snapshot,
+      second_snapshot=second_snapshot
+    ) 
 
     if self.args.dryrun:
       sys.stdout.write(cmd)
