@@ -3,6 +3,13 @@ import os
 
 from subprocess import PIPE, STDOUT, Popen
 
+try:
+  from raven import Client
+  sentry_dsn = os.environ['ZSYNC_SENTRY_DSN']
+  client = Client(sentry_dsn)
+except:
+  client = None
+
 
 class S3Snapshot(object):
 
@@ -16,8 +23,13 @@ class S3Snapshot(object):
 
     AWS_ACCESS_KEY = self.context.args.access_key
     AWS_SECRET_KEY = self.context.args.secret_key
-    connection = boto.connect_s3(AWS_ACCESS_KEY, AWS_SECRET_KEY)
-    bucket = connection.get_bucket(bucket, validate=False)
+
+    try:
+      connection = boto.connect_s3(AWS_ACCESS_KEY, AWS_SECRET_KEY)
+      bucket = connection.get_bucket(bucket, validate=True)
+    except:
+      if client:
+        client.captureException()
 
     snapshots = []
 

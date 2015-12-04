@@ -12,10 +12,11 @@ from concurrent.futures import ThreadPoolExecutor
 
 try:
   from raven import Client
-  # client = Client('http://6374ae28bffb49ffb354c4ae7e90586b:6edd2b5c47b04afcb8853fe9b0d99976@sentry.presslabs.net/5')
-  client = None
+  sentry_dsn = os.environ['ZSYNC_SENTRY_DSN']
+  client = Client(sentry_dsn)
 except:
-  pass
+  client = None
+
 
 class Downloader(object):
 
@@ -26,30 +27,42 @@ class Downloader(object):
     self.chunk_size = int(chunk_size) * 1024 * 1024
     self.concurrency = int(concurrency)
 
-    self.connection = boto.connect_s3(access_key, secret_key)
+    try:
+      self.connection = boto.connect_s3(access_key, secret_key)
+    except:
+      if client:
+        client.captureException()
 
   def download_part(self, fp, bucket, key, part):
     min_byte = int(part * self.chunk_size)
     max_byte = int((part+1) * self.chunk_size)
 
-    resp = self.connection.make_request(
-      "GET",
-      bucket=bucket, key=key,
-      headers={
-        'Range':"bytes=%d-%d" % (min_byte, max_byte)
-      }
-    )
+    try:
+      resp = self.connection.make_request(
+        "GET",
+        bucket=bucket, key=key,
+        headers={
+          'Range':"bytes=%d-%d" % (min_byte, max_byte)
+        }
+      )
 
-    data = resp.read(int(self.chunk_size))
+      data = resp.read(int(self.chunk_size))
+    except:
+      if client:
+        client.captureException()
 
     return data
 
   def download(self, fp, bucket, key):
-    bucket = self.connection.get_bucket(bucket, validate=False)
-    key = bucket.get_key(key)
+    try:
+      bucket = self.connection.get_bucket(bucket, validate=True)
+      key = bucket.get_key(key)
 
-    resp = self.connection.make_request("HEAD", bucket=bucket, key=key)
-    size = int(resp.getheader("content-length"))
+      resp = self.connection.make_request("HEAD", bucket=bucket, key=key)
+      size = int(resp.getheader("content-length"))
+    except:
+      if client:
+        client.captureException()
 
     results = {}
 

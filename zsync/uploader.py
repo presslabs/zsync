@@ -12,13 +12,15 @@ from threading import Semaphore
 
 try:
   from raven import Client
-  # client = Client('http://6374ae28bffb49ffb354c4ae7e90586b:6edd2b5c47b04afcb8853fe9b0d99976@sentry.presslabs.net/5')
-  client = None
+  sentry_dsn = os.environ['ZSYNC_SENTRY_DSN']
+  client = Client(sentry_dsn)
 except:
-  pass
+  client = None
+
 
 class ChunkNotCompleted(Exception):
   pass
+
 
 class Uploader(object):
   """
@@ -32,16 +34,30 @@ class Uploader(object):
     self.chunk_size = int(chunk_size) * 1024 * 1024
     self.concurrency = int(concurrency)
 
+  def _get_s3_bucket(self, bucket_name):
+    try:
+      connection = boto.connect_s3(self.access_key, self.secret_key)
+      bucket = connection.get_bucket(bucket_name, validate=True)
+    except:
+      if client:
+        client.captureException()
+
+    return bucket
+
   def upload_part(self, multipart, chunk, index):
-    connection = boto.connect_s3(self.access_key, self.secret_key)
-    bucket = connection.get_bucket(multipart.bucket_name, validate=False)
+    bucket = self._get_s3_bucket(multipart.bucket_name)
+
     retries = 0
 
     def do_upload(bucket, chunk, index):
-      part = boto.s3.multipart.MultiPartUpload(bucket)
-      part.id = multipart.id
-      part.key_name = multipart.key_name
-      part.upload_part_from_file(StringIO(chunk), index+1, replace=True)
+      try:
+        part = boto.s3.multipart.MultiPartUpload(bucket)
+        part.id = multipart.id
+        part.key_name = multipart.key_name
+        part.upload_part_from_file(StringIO(chunk), index+1, replace=True)
+      except:
+        if client:
+          client.captureException()
 
     while retries < 5:
       try:
@@ -59,16 +75,19 @@ class Uploader(object):
       raise ChunkNotCompleted("Chunk %s not completed" % index)
 
   def upload(self, stream, bucket, key, storage_class):
-    connection = boto.connect_s3(self.access_key, self.secret_key)
-    bucket = connection.get_bucket(bucket, validate=False)
+    bucket = self._get_s3_bucket(bucket)
 
-    multipart = bucket.initiate_multipart_upload(
-      key,
-      headers={
-        "x-amz-acl": "bucket-owner-full-control",
-        "x-amz-storage-class": storage_class
-      }
-    )
+    try:
+      multipart = bucket.initiate_multipart_upload(
+        key,
+        headers={
+          "x-amz-acl": "bucket-owner-full-control",
+          "x-amz-storage-class": storage_class
+        }
+      )
+    except:
+      if client:
+        client.captureException()
 
     index = 0
 
