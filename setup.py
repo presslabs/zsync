@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-requires = [ "pyCLI>=2.0.3", "boto>=2.14.0", "futures>=2.1.4", "raven" ]
+requires = [ "pyCLI>=2.0.3", "boto>=2.14.0", "futures>=2.1.4", "raven==4.2.3" ]
 
 setup(name="zsync",
       version="0.1",
