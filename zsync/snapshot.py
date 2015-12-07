@@ -21,8 +21,8 @@ class S3Snapshot(object):
     path = "/".join(self.context.data.path)
     path = path[1:]
 
-    AWS_ACCESS_KEY = self.context.args.access_key or os.environ['AWS_ACCESS_KEY ']
-    AWS_SECRET_KEY = self.context.args.secret_key or os.environ['AWS_SECRET_KEY ']
+    AWS_ACCESS_KEY = self.context.args.access_key or os.environ['AWS_ACCESS_KEY']
+    AWS_SECRET_KEY = self.context.args.secret_key or os.environ['AWS_SECRET_KEY']
 
     try:
       connection = boto.connect_s3(AWS_ACCESS_KEY, AWS_SECRET_KEY)
