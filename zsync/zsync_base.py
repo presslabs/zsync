@@ -1,3 +1,5 @@
+# vim: ft=python:sw=2:ts=2:sts=2:et:fileencoding=utf8:nu:
+
 from location import Location
 from zsync.factory import Factory
 

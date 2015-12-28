@@ -1,3 +1,5 @@
+# vim: ft=python:sw=2:ts=2:sts=2:et:fileencoding=utf8:nu:
+
 """
 Entry point for the zsync command line tool. Sets up the CLI params and then
 runs an instance of the ZSyncBase class.
