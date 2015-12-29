@@ -18,7 +18,7 @@ class Local(Sync):
     else:
       data = call(cmd, shell=True, stdout=PIPE)
 
-  def _send_full_snahpshot(self, dataset, destination, first_snapshot):
+  def _send_full_snapshot(self, dataset, destination, first_snapshot):
     cmd = "zfs send %s@%s" % (dataset, first_snapshot)
 
     if self.args.dryrun:

@@ -30,7 +30,7 @@ class Sync(Pipeable, Receivable):
     send to each implementation the task to send the ZFS volume with the last
     snapshot beeing _until_snapshot_
     """
-    self._send_full_snahpshot(self.data.dataset, destination, until_snapshot)
+    self._send_full_snapshot(self.data.dataset, destination, until_snapshot)
 
   def validate(self, snapshot):
     if self.args.exclude != None:
@@ -91,7 +91,7 @@ class Sync(Pipeable, Receivable):
 
     if latest_snapshot == None:
       # if there are no snapshots means we need to create the volume
-      self._send_full_snahpshot(self.data.dataset, destination, current_snapshot)
+      self._send_full_snapshot(self.data.dataset, destination, current_snapshot)
 
     for remaining in all_snapshots:
       self._send_incremental_snapshot(self.data.dataset, destination,

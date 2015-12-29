@@ -9,7 +9,7 @@ class Remote(Sync):
   def __init__(self, data, log):
     super(Remote, self).__init__(data, log)
 
-  def _send_full_snahpshot(self, dataset, destination, first_snapshot):
+  def _send_full_snapshot(self, dataset, destination, first_snapshot):
     ssh_cmd = "%s %s zfs send %s@%s" % (self.args.e, self.data.host, dataset, first_snapshot)
 
     if self.args.dryrun:

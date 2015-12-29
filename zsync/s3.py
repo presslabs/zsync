@@ -33,7 +33,7 @@ class S3(Sync):
 
     Downloader(AWS_ACCESS_KEY, AWS_SECRET_KEY, CHUNK_SIZE, CONCURRENCY).download(fp, bucket, key)
 
-  def _send_full_snahpshot(self, dataset, destination, first_snapshot):
+  def _send_full_snapshot(self, dataset, destination, first_snapshot):
     """
     Retrives a snapshot and passes it a pipe from which the zfs receive reads
     """
@@ -65,7 +65,7 @@ class S3(Sync):
     There are no incremental snapshots from S3 so it fails back to the
     full snapshot.
     """
-    self._send_full_snahpshot(dataset, destination, second_snapshot)
+    self._send_full_snapshot(dataset, destination, second_snapshot)
 
   def _send_full_volume(self, until_snapshot, destination):
     """
