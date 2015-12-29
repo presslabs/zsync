@@ -83,7 +83,8 @@ class Uploader(object):
         headers={
           "x-amz-acl": "bucket-owner-full-control",
           "x-amz-storage-class": storage_class
-        }
+        },
+        metadata={'awesome-key': 'test-value'}
       )
     except:
       if client:
